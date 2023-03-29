@@ -7,7 +7,7 @@ from time import sleep
 from random import randint
 import re
 
-class EngelAndVolkersSraper:
+class EngelAndVolkersScraper:
     def __init__(self, url, driver):
         self.mainUrl = url
         self.driver = driver
@@ -89,5 +89,5 @@ if __name__ == '__main__':
     driver = uc.Chrome(use_subprocess=True)
     userAgent = driver.execute_script("return navigator.userAgent")
     print("User-Agent:",userAgent)
-    eav = EngelAndVolkersSraper(target_url, driver)
+    eav = EngelAndVolkersScraper(target_url, driver)
     eav.get_data()
