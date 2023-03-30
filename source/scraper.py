@@ -82,12 +82,9 @@ class EngelAndVolkersScraper:
         subtitle = self.driver.find_element(By.XPATH, "//div[@class='ev-exposee-content ev-exposee-subtitle']").text
         
         # Elementos principales en la cabecera de la información de la vivienda
+        # Son los acompañados de icono y texto
         feature_head_titles = [title.text.lower() for title in self.driver.find_elements(By.XPATH, "//div[@class='ev-key-fact-title']") if title.is_displayed()]
         feature_head_values = [value.text for value in self.driver.find_elements(By.XPATH, "//div[@class='ev-key-fact-value']") if value.is_displayed()]
-
-        # Detalles a tener en cuenta de la vivienda, hay algunos valores que coinciden con los de cabecera
-        feature_detail_titles = [title.text.lower() for title in self.driver.find_elements(By.XPATH, "//label[@class='ev-exposee-detail-fact-key']")]
-        feature_detail_values = [value.text for value in self.driver.find_elements(By.XPATH, "//span[@class='ev-exposee-detail-fact-value']")]
         
         n_rooms, n_bathrooms, price, area, land, units = None, None, None, None, None, None
         for i in range(len(feature_head_titles)):
@@ -104,6 +101,11 @@ class EngelAndVolkersScraper:
                 land = element_value
             elif (re.match("^unidades residenciales$", element_title)):
                 units = element_value
+
+        # Detalles a tener en cuenta de la vivienda, hay algunos valores que coinciden con los de cabecera
+        # Están más abajo y tienen un título similar a 'LO QUE TIENE QUE SABER SOBRE'
+        feature_detail_titles = [title.text.lower() for title in self.driver.find_elements(By.XPATH, "//label[@class='ev-exposee-detail-fact-key']")]
+        feature_detail_values = [value.text for value in self.driver.find_elements(By.XPATH, "//span[@class='ev-exposee-detail-fact-value']")]
 
         
         print(title,subtitle)
@@ -154,7 +156,7 @@ class EngelAndVolkersScraper:
 """
 Programa principal
 Se indica la URL de EngelAndVolkers con el municipio
-Se carga el webdriver, se imprimer el User-Agent y se inicia el wescraping
+Se carga el webdriver, se imprime el User-Agent y se inicia el wescraping
 """
 if __name__ == '__main__':
     target_url = "https://www.engelvoelkers.com/es/search/?q=&startIndex=0&businessArea=residential&sortOrder=DESC&sortField=sortPrice&pageSize=18&facets=bsnssr%3Aresidential%3Bcntry%3Aspain%3Brgn%3Abarcelona%3Btyp%3Abuy%3B"
