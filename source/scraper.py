@@ -64,6 +64,12 @@ class EngelAndVolkersScraper:
             return driver.find_element(By.CLASS_NAME, 'ev-pager-next').get_attribute('href')
         except NoSuchElementException:
             return None
+    
+    def _generate_string(self, item, column_name, head=False):
+        if (head):
+            return item[0:item.index(column_name)]
+        else:
+            return item[item.index(column_name)+len(column_name)+1:]
 
     """
     Se hace scraping en la web de la vivienda cargada para sacar los atributos necesarios para generar el csv
@@ -74,56 +80,84 @@ class EngelAndVolkersScraper:
     @Return: FIXME
     """
     def _build_house(self):
-
-        house = {
-            "eav_id": None,
-            "n_rooms": None,
-            "n_bedrooms": None,
-            "n_bathrooms": None,
-            "price": None,
-            "useful_area": None,
-            "built_area": None,
-            "land_area": None,
-        }
+        house = {}
 
         # Nombre de la vivienda
         title = self.driver.find_element(By.XPATH, "//h1[@class='ev-exposee-title ev-exposee-headline']").text
+        house['title'] = title
 
         # Información adicional al nombre de la vivienda
         subtitle = self.driver.find_element(By.XPATH, "//div[@class='ev-exposee-content ev-exposee-subtitle']").text
+        house['subtitle'] = subtitle
 
         # Elementos principales en la cabecera de la información de la vivienda
         # Son los acompañados de icono y texto
         feature_head_items = [ item.text.replace("\n", "") for item in self.driver.find_elements(By.XPATH, "//div[contains(@class,'ev-key-facts')]/div[contains(@class,'ev-key-fact')]") if item.is_displayed()]
-
         for feature_head_item in feature_head_items:
             if ("Cuartos" in feature_head_item):
-                house['n_rooms'] = feature_head_item[0:feature_head_item.index("Cuartos")]
-
+                house.setdefault('n_rooms', self._generate_string(feature_head_item, "Cuartos", True))
             elif ("Dormitorios" in feature_head_item):
-                house['n_bedrooms'] = feature_head_item[0:feature_head_item.index("Dormitorios")]
-
+                house.setdefault('n_rooms', self._generate_string(feature_head_item, "Dormitorios", True))
             elif ("Baños" in feature_head_item):
-                house['n_bathrooms'] = feature_head_item[0:feature_head_item.index("Baños")]
-
+                house.setdefault('n_rooms', self._generate_string(feature_head_item, "Baños", True))
             elif ("Precio" in feature_head_item):
-                house['price'] = feature_head_item[0:feature_head_item.index("Precio")]
-
+                house.setdefault('n_rooms', self._generate_string(feature_head_item, "Precio", True))
             elif ("Superficie habitable aprox." in feature_head_item):
-                house['useful_area'] = feature_head_item[0:feature_head_item.index("Superficie habitable aprox.")]
-
+                house.setdefault('n_rooms', self._generate_string(feature_head_item, "Superficie habitable aprox.", True))
             elif ("Superficie construida aprox." in feature_head_item):
-                house['built_area'] = feature_head_item[0:feature_head_item.index("Superficie construida aprox.")]
-
+                house.setdefault('n_rooms', self._generate_string(feature_head_item, "Superficie construida aprox.", True))
             elif ("Terreno aprox." in feature_head_item):
-                house['land_area'] = feature_head_item[0:feature_head_item.index("Terreno aprox.")]
-
-
-
-#[ item.text.replace("\n", " ") for item in self.driver.find_elements(By.XPATH, "//div[@class='ev-exposee-content ev-key-facts']/div[@class='ev-key-fact']")]
+                house.setdefault('n_rooms', self._generate_string(feature_head_item, "Terreno aprox.", True))
         
-        
+        feature_detail_items = [item.text for item in self.driver.find_elements(By.XPATH, "//ul[contains(@class,'ev-exposee-detail-facts')]/li[contains(@class,'ev-exposee-detail-fact')]") if item]
+        for feature_detail_item in feature_detail_items:
+            # POSIBLES REPETIDOS
+            if ("Cuartos" in feature_detail_item):
+                house.setdefault('n_rooms', self._generate_string(feature_detail_item, "Cuartos"))
+            elif ("Dormitorios" in feature_detail_item):
+                house.setdefault('n_bedrooms', self._generate_string(feature_detail_item, "Dormitorios"))
+            elif ("Baños" in feature_detail_item):
+                house.setdefault('n_bathrooms', self._generate_string(feature_detail_item, "Baños"))
+            elif ("Superficie habitable aprox." in feature_detail_item):
+                house.setdefault('useful_area', self._generate_string(feature_detail_item, "Superficie habitable aprox."))
+            elif ("Superficie construida aprox." in feature_detail_item):
+                house.setdefault('built_area', self._generate_string(feature_detail_item, "Superficie construida aprox."))
+            elif ("Terreno aprox." in feature_detail_item):
+                house.setdefault('land_area', self._generate_string(feature_detail_item, "Terreno aprox."))
 
+            # NO REPETIDOS
+            elif ("E&V ID" in feature_detail_item):
+                house.setdefault('eav_id', self._generate_string(feature_detail_item, "E&V ID"))
+            elif ("Año de construcción" in feature_detail_item):
+                house.setdefault('built_year', self._generate_string(feature_detail_item, "Año de construcción"))
+            elif ("Clase de eficiencia energética" in feature_detail_item):
+                house.setdefault('energy_class', self._generate_string(feature_detail_item, "Clase de eficiencia energética"))
+            elif ("Valor de consumo energético" in feature_detail_item):
+                house.setdefault('energy_consumption', self._generate_string(feature_detail_item, "Valor de consumo energético"))
+            elif ("CO2 emission" in feature_detail_item):
+                house.setdefault('co2_emission', self._generate_string(feature_detail_item, "CO2 emission"))
+            elif ("Escala de Emisiones de CO2" in feature_detail_item):
+                house.setdefault('co2_emission_scale', self._generate_string(feature_detail_item, "Escala de Emisiones de CO2"))
+            elif ("Edificio protegido" in feature_detail_item):
+                house['protected'] = True
+            elif ("Estado" in feature_detail_item):
+                house.setdefault('status', self._generate_string(feature_detail_item, "Estado"))
+            elif ("Parking" in feature_detail_item):
+                house.setdefault('parking', self._generate_string(feature_detail_item, "Parking"))
+            elif ("Garaje" in feature_detail_item):
+                house.setdefault('garage', self._generate_string(feature_detail_item, "Garaje"))
+            elif ("Revestimiento del suelo" in feature_detail_item):
+                house.setdefault('floor_cover', self._generate_string(feature_detail_item, "Revestimiento del suelo"))
+            elif ("Subclase de la propiedad" in feature_detail_item):
+                house.setdefault('property_subclass', self._generate_string(feature_detail_item, "Subclase de la propiedad"))
+            elif ("Terraza" in feature_detail_item):
+                house.setdefault('terrace_area', self._generate_string(feature_detail_item, "Terraza"))
+            elif ("Tipo de calefacción" in feature_detail_item):
+                house.setdefault('heating_type', self._generate_string(feature_detail_item, "Tipo de calefacción"))
+            elif ("Ubicación" in feature_detail_item):
+                house.setdefault('location_status', self._generate_string(feature_detail_item, "Ubicación"))
+  
+        print("\n")
         print("------",title,"--------")
         return house
     
