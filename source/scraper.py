@@ -74,17 +74,7 @@ class EngelAndVolkersScraper:
     @Return: FIXME
     """
     def _build_house(self):
-        # Nombre de la vivienda
-        title = self.driver.find_element(By.XPATH, "//h1[@class='ev-exposee-title ev-exposee-headline']").text
 
-        # Información adicional al nombre de la vivienda
-        subtitle = self.driver.find_element(By.XPATH, "//div[@class='ev-exposee-content ev-exposee-subtitle']").text
-        
-        # Elementos principales en la cabecera de la información de la vivienda
-        # Son los acompañados de icono y texto
-        feature_head_titles = [title.text.lower() for title in self.driver.find_elements(By.XPATH, "//div[@class='ev-key-fact-title']") if title.is_displayed()]
-        feature_head_values = [value.text for value in self.driver.find_elements(By.XPATH, "//div[@class='ev-key-fact-value']") if value.is_displayed()]
-        
         house = {
             "eav_id": None,
             "n_rooms": None,
@@ -94,109 +84,46 @@ class EngelAndVolkersScraper:
             "useful_area": None,
             "built_area": None,
             "land_area": None,
-            "built_year": None,
-            "units": None,
-            "heating_type": None,
-            "location_status": None,
-            "energy_class": None,
-            "energy_consumption": None,
-            "co2_emission": None,
-            "co2_emission_scale": None,
-            "parking": None,
-            "status": None,
-            "vpo": False,
-            "terrace_area": None,
-            "floor_cover": None,
-            "porperty_subclass": None
         }
 
-        # Variables de la cabecera de la vivienda (algunas estan en detalles también)
-        for i in range(len(feature_head_titles)):
-            element_title, element_value = feature_head_titles[i], feature_head_values[i]
-            if ("cuartos" == element_title):
-                house['n_rooms'] = element_value
-            if ("dormitorios" == element_title):
-                house['n_bedrooms'] = element_value
-            elif ("baños" == element_title):
-                house['n_bathrooms'] = element_value
-            elif ("precio" == element_title):
-                house['price'] = element_value
-            elif ("superficie habitable aprox." == element_title):
-                house['useful_area'] = element_value
-            elif ("superficie construida aprox." == element_title):
-                house['built_area'] = element_value
-            elif ("terreno aprox." == element_title):
-                house['land_area'] = element_value
-            elif ("unidades residenciales" == element_title):
-                house['units'] = element_value
+        # Nombre de la vivienda
+        title = self.driver.find_element(By.XPATH, "//h1[@class='ev-exposee-title ev-exposee-headline']").text
 
-        # Detalles a tener en cuenta de la vivienda, hay algunos valores que coinciden con los de cabecera
-        # Están más abajo y tienen un título similar a 'LO QUE TIENE QUE SABER SOBRE'
-        # Algunos parámetros como habitaciones, baños o superficies se pueden rescatar de aquí si faltaran en la cabecera pero aquí no
+        # Información adicional al nombre de la vivienda
+        subtitle = self.driver.find_element(By.XPATH, "//div[@class='ev-exposee-content ev-exposee-subtitle']").text
+
+        # Elementos principales en la cabecera de la información de la vivienda
+        # Son los acompañados de icono y texto
+        feature_head_items = [ item.text.replace("\n", "") for item in self.driver.find_elements(By.XPATH, "//div[contains(@class,'ev-key-facts')]/div[contains(@class,'ev-key-fact')]") if item.is_displayed()]
+
+        for feature_head_item in feature_head_items:
+            if ("Cuartos" in feature_head_item):
+                house['n_rooms'] = feature_head_item[0:feature_head_item.index("Cuartos")]
+
+            elif ("Dormitorios" in feature_head_item):
+                house['n_bedrooms'] = feature_head_item[0:feature_head_item.index("Dormitorios")]
+
+            elif ("Baños" in feature_head_item):
+                house['n_bathrooms'] = feature_head_item[0:feature_head_item.index("Baños")]
+
+            elif ("Precio" in feature_head_item):
+                house['price'] = feature_head_item[0:feature_head_item.index("Precio")]
+
+            elif ("Superficie habitable aprox." in feature_head_item):
+                house['useful_area'] = feature_head_item[0:feature_head_item.index("Superficie habitable aprox.")]
+
+            elif ("Superficie construida aprox." in feature_head_item):
+                house['built_area'] = feature_head_item[0:feature_head_item.index("Superficie construida aprox.")]
+
+            elif ("Terreno aprox." in feature_head_item):
+                house['land_area'] = feature_head_item[0:feature_head_item.index("Terreno aprox.")]
+
+
+
+#[ item.text.replace("\n", " ") for item in self.driver.find_elements(By.XPATH, "//div[@class='ev-exposee-content ev-key-facts']/div[@class='ev-key-fact']")]
         
-        feature_detail_titles = [title.text.lower() for title in self.driver.find_elements(By.XPATH, "//div[@class='ev-exposee-detail']/ul[@class='ev-exposee-content ev-exposee-detail-facts ']/li[@class='ev-exposee-detail-fact']/label[@class='ev-exposee-detail-fact-key']")]
-        feature_detail_values = [value.text for value in self.driver.find_elements(By.XPATH, "//div[@class='ev-exposee-detail']/ul[@class='ev-exposee-content ev-exposee-detail-facts ']/li[@class='ev-exposee-detail-fact']/span[@class='ev-exposee-detail-fact-value']")]
-
-        print("33333333333")
-        print(feature_detail_titles)
-        print("22222222222")
-        print(feature_detail_values)
-        print("33333333333")
-        print("\n")
-
-        for i in range(len(feature_detail_titles)):
-            detail_element_title, detail_element_value = feature_detail_titles[i], feature_detail_values[i]
-            # POSIBLES REPETIDOS
-            if ("cuartos" == detail_element_title and house['n_rooms'] == None):
-                house['n_rooms'] = detail_element_value
-            if ("dormitorios" == detail_element_title and house['n_bedrooms'] == None):
-                house['n_bedrooms'] = detail_element_value
-            elif ("baños" == detail_element_title and house['n_bathrooms'] == None):
-                house['n_bathrooms'] = detail_element_value
-            elif ("superficie habitable aprox." == detail_element_title and house['useful_area'] == None):
-                house['useful_area'] = detail_element_value
-            elif ("superficie construida aprox." == detail_element_title and house['built_area'] == None):
-                house['built_area'] = detail_element_value
-            elif ("terreno aprox." == detail_element_title and house['land_area'] == None):
-                house['land_area'] = detail_element_value
-            # NO REPETIDOS
-            elif ("e&v id" == detail_element_title):
-                house['eav_id'] = detail_element_value
-            elif ("año de construcción" == detail_element_title):
-                house['built_year'] = detail_element_value
-                print("TEST")
-                print(i, detail_element_title, detail_element_value)
-            elif ("clase de eficiencia energética" == detail_element_title):
-                house['energy_class'] = detail_element_value
-            elif ("valor de consumo energético" == detail_element_title):
-                house['energy_consumption'] = detail_element_value
-            elif ("co2 emission" == detail_element_title):
-                house['co2_emission'] = detail_element_value
-            elif ("escala de emisiones de co2" == detail_element_title):
-                house['co2_emission_scale'] = detail_element_value
-            elif ("edificio protegido" == detail_element_title):
-                house['vpo'] = True
-            elif ("estado" == detail_element_title):
-                house['status'] = detail_element_value
-            # Una casa tiene o parking o garage
-            elif ("parking" == detail_element_title or "garaje" == detail_element_title):
-                house['parking'] = detail_element_value
-            elif ("revestimiento del suelo" == detail_element_title):
-                house['floor_cover'] = detail_element_value
-            elif ("subclase de la propiedad" == detail_element_title):
-                house['porperty_subclass'] = detail_element_value
-            elif ("terraza" == detail_element_title):
-                house['terrace_area'] = detail_element_value
-            elif ("tipo de calefacción" == detail_element_title):
-                house['heating_type'] = detail_element_value
-            elif ("ubicación" == detail_element_title):
-                house['location_status'] = detail_element_value
-
-            
         
-        #print(title,subtitle)
-        #print(feature_detail_titles)
-        #print(feature_detail_values)
+
         print("------",title,"--------")
         return house
     
