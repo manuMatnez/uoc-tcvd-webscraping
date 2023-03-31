@@ -5,7 +5,6 @@ from selenium.webdriver.common.by import By
 from selenium.common.exceptions import NoSuchElementException
 from time import sleep
 from random import randint
-import re
 
  # 
  # This file is part of the practice 1 of the Tipología y ciclo de vida de los datos
@@ -43,7 +42,7 @@ class EngelAndVolkersScraper:
     @Return void
     """
     def _get_page(self, url): 
-        sleep(randint(2,5))
+        sleep(randint(1,3))
         self.driver.get(url)
 
     """
@@ -86,32 +85,120 @@ class EngelAndVolkersScraper:
         feature_head_titles = [title.text.lower() for title in self.driver.find_elements(By.XPATH, "//div[@class='ev-key-fact-title']") if title.is_displayed()]
         feature_head_values = [value.text for value in self.driver.find_elements(By.XPATH, "//div[@class='ev-key-fact-value']") if value.is_displayed()]
         
-        n_rooms, n_bathrooms, price, area, land, units = None, None, None, None, None, None
+        house = {
+            "eav_id": None,
+            "n_rooms": None,
+            "n_bedrooms": None,
+            "n_bathrooms": None,
+            "price": None,
+            "useful_area": None,
+            "built_area": None,
+            "land_area": None,
+            "built_year": None,
+            "units": None,
+            "heating_type": None,
+            "location_status": None,
+            "energy_class": None,
+            "energy_consumption": None,
+            "co2_emission": None,
+            "co2_emission_scale": None,
+            "parking": None,
+            "status": None,
+            "vpo": False,
+            "terrace_area": None,
+            "floor_cover": None,
+            "porperty_subclass": None
+        }
+
+        # Variables de la cabecera de la vivienda (algunas estan en detalles también)
         for i in range(len(feature_head_titles)):
             element_title, element_value = feature_head_titles[i], feature_head_values[i]
-            if (re.match("^(dormitorios|cuartos)$", element_title)):
-                n_rooms = element_value
-            elif (re.match("^(baños)$", element_title)):
-                n_bathrooms = element_value
-            elif (re.match("^(precio)$", element_title)):
-                price = element_value
-            elif (re.match("^(superficie habitable aprox.|superficie construida aprox.)$", element_title)):
-                area = element_value
-            elif (re.match("^terreno aprox.$", element_title)):
-                land = element_value
-            elif (re.match("^unidades residenciales$", element_title)):
-                units = element_value
+            if ("cuartos" == element_title):
+                house['n_rooms'] = element_value
+            if ("dormitorios" == element_title):
+                house['n_bedrooms'] = element_value
+            elif ("baños" == element_title):
+                house['n_bathrooms'] = element_value
+            elif ("precio" == element_title):
+                house['price'] = element_value
+            elif ("superficie habitable aprox." == element_title):
+                house['useful_area'] = element_value
+            elif ("superficie construida aprox." == element_title):
+                house['built_area'] = element_value
+            elif ("terreno aprox." == element_title):
+                house['land_area'] = element_value
+            elif ("unidades residenciales" == element_title):
+                house['units'] = element_value
 
         # Detalles a tener en cuenta de la vivienda, hay algunos valores que coinciden con los de cabecera
         # Están más abajo y tienen un título similar a 'LO QUE TIENE QUE SABER SOBRE'
-        feature_detail_titles = [title.text.lower() for title in self.driver.find_elements(By.XPATH, "//label[@class='ev-exposee-detail-fact-key']")]
-        feature_detail_values = [value.text for value in self.driver.find_elements(By.XPATH, "//span[@class='ev-exposee-detail-fact-value']")]
-
+        # Algunos parámetros como habitaciones, baños o superficies se pueden rescatar de aquí si faltaran en la cabecera pero aquí no
         
-        print(title,subtitle)
+        feature_detail_titles = [title.text.lower() for title in self.driver.find_elements(By.XPATH, "//div[@class='ev-exposee-detail']/ul[@class='ev-exposee-content ev-exposee-detail-facts ']/li[@class='ev-exposee-detail-fact']/label[@class='ev-exposee-detail-fact-key']")]
+        feature_detail_values = [value.text for value in self.driver.find_elements(By.XPATH, "//div[@class='ev-exposee-detail']/ul[@class='ev-exposee-content ev-exposee-detail-facts ']/li[@class='ev-exposee-detail-fact']/span[@class='ev-exposee-detail-fact-value']")]
+
+        print("33333333333")
         print(feature_detail_titles)
+        print("22222222222")
         print(feature_detail_values)
-        print("--------------")
+        print("33333333333")
+        print("\n")
+
+        for i in range(len(feature_detail_titles)):
+            detail_element_title, detail_element_value = feature_detail_titles[i], feature_detail_values[i]
+            # POSIBLES REPETIDOS
+            if ("cuartos" == detail_element_title and house['n_rooms'] == None):
+                house['n_rooms'] = detail_element_value
+            if ("dormitorios" == detail_element_title and house['n_bedrooms'] == None):
+                house['n_bedrooms'] = detail_element_value
+            elif ("baños" == detail_element_title and house['n_bathrooms'] == None):
+                house['n_bathrooms'] = detail_element_value
+            elif ("superficie habitable aprox." == detail_element_title and house['useful_area'] == None):
+                house['useful_area'] = detail_element_value
+            elif ("superficie construida aprox." == detail_element_title and house['built_area'] == None):
+                house['built_area'] = detail_element_value
+            elif ("terreno aprox." == detail_element_title and house['land_area'] == None):
+                house['land_area'] = detail_element_value
+            # NO REPETIDOS
+            elif ("e&v id" == detail_element_title):
+                house['eav_id'] = detail_element_value
+            elif ("año de construcción" == detail_element_title):
+                house['built_year'] = detail_element_value
+                print("TEST")
+                print(i, detail_element_title, detail_element_value)
+            elif ("clase de eficiencia energética" == detail_element_title):
+                house['energy_class'] = detail_element_value
+            elif ("valor de consumo energético" == detail_element_title):
+                house['energy_consumption'] = detail_element_value
+            elif ("co2 emission" == detail_element_title):
+                house['co2_emission'] = detail_element_value
+            elif ("escala de emisiones de co2" == detail_element_title):
+                house['co2_emission_scale'] = detail_element_value
+            elif ("edificio protegido" == detail_element_title):
+                house['vpo'] = True
+            elif ("estado" == detail_element_title):
+                house['status'] = detail_element_value
+            # Una casa tiene o parking o garage
+            elif ("parking" == detail_element_title or "garaje" == detail_element_title):
+                house['parking'] = detail_element_value
+            elif ("revestimiento del suelo" == detail_element_title):
+                house['floor_cover'] = detail_element_value
+            elif ("subclase de la propiedad" == detail_element_title):
+                house['porperty_subclass'] = detail_element_value
+            elif ("terraza" == detail_element_title):
+                house['terrace_area'] = detail_element_value
+            elif ("tipo de calefacción" == detail_element_title):
+                house['heating_type'] = detail_element_value
+            elif ("ubicación" == detail_element_title):
+                house['location_status'] = detail_element_value
+
+            
+        
+        #print(title,subtitle)
+        #print(feature_detail_titles)
+        #print(feature_detail_values)
+        print("------",title,"--------")
+        return house
     
     """
     Declina el uso de cookies de la página web
@@ -126,31 +213,28 @@ class EngelAndVolkersScraper:
             pass
         
     """
-    Se encarga de ir sacando todos los enlaces de todas las páginas de viviendas de EngelAndVolkers para una ubicación
-    Dichos enlaces de almacenan en una lista local para posteriormente recorrela
+    Navega por cada p´gina de la busqueda de viviendas, en cada página se extraen los links de las viviendas
     En la primera iteración se ha de aceptar/declinar las cookies
-    Después se ha de ir recorriendo de uno en uno para hacer scraping de cada vivienda y escribir en un archivo csv
     @Return: void
     """
     def get_data(self):
         i = 0
-        pageToExplore = self.mainUrl
-        links = self._get_item_links()
-        while pageToExplore != None:
-            if (i == 1):
+        nextPage = self.mainUrl
+        while nextPage != None:
+            if (i == 2):
                 break
-            self._get_page(pageToExplore)
-            
-            if (pageToExplore == self.mainUrl):
+            self._get_page(nextPage)
+
+            if (nextPage == self.mainUrl):
                 self._decline_cookies()
-            
-            links = links + self._get_item_links()
-            pageToExplore = self._get_next_page()
+            nextPage = self._get_next_page()
+
+            for link in self._get_item_links():
+                self._get_page(link)
+                tmp = self._build_house()
+                print(tmp)
+
             i += 1
-        houses = list()
-        for link in links:
-            self._get_page(link)
-            house = self._build_house()
         self.driver.close()
 
 """
