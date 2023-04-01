@@ -88,7 +88,32 @@ class EngelAndVolkersScraper:
     @Return: dict
     """
     def _build_house(self):
-        house = {}
+        house = {
+            "eav_id": None,
+            "title": None,
+            "subtitle": None,
+            "n_rooms": None,
+            "n_bedrooms": None,
+            "n_bathrooms": None,
+            "useful_area": None,
+            "built_area": None,
+            "land_area": None,
+            "price": None,
+            "built_year": None,
+            "energy_class": None,
+            "energy_consumption": None,
+            "co2_emission": None,
+            "co2_emission_scale": None,
+            "protected": False,
+            "status": None,
+            "parking": None,
+            "garage": None,
+            "floor_cover": None,
+            "property_subclass": None,
+            "terrace_area": None,
+            "heating_type": None,
+            "location_status": None
+        }
 
         # Nombre de la vivienda
         title = self.driver.find_element(By.XPATH, "//h1[@class='ev-exposee-title ev-exposee-headline']").text
@@ -103,67 +128,67 @@ class EngelAndVolkersScraper:
         feature_head_items = [ item.text.replace("\n", "") for item in self.driver.find_elements(By.XPATH, "//div[contains(@class,'ev-key-facts')]/div[contains(@class,'ev-key-fact')]") if item.is_displayed()]
         for feature_head_item in feature_head_items:
             if ("Cuartos" in feature_head_item):
-                house.setdefault('n_rooms', self._generate_string(feature_head_item, "Cuartos", True))
+                house['n_rooms'] =  self._generate_string(feature_head_item, "Cuartos", True)
             elif ("Dormitorios" in feature_head_item):
-                house.setdefault('n_rooms', self._generate_string(feature_head_item, "Dormitorios", True))
+                house['n_bedrooms'] = self._generate_string(feature_head_item, "Dormitorios", True)
             elif ("Baños" in feature_head_item):
-                house.setdefault('n_rooms', self._generate_string(feature_head_item, "Baños", True))
+                house['n_bathrooms'] = self._generate_string(feature_head_item, "Baños", True)
             elif ("Precio" in feature_head_item):
-                house.setdefault('n_rooms', self._generate_string(feature_head_item, "Precio", True))
+                house['price'] = self._generate_string(feature_head_item, "Precio", True)
             elif ("Superficie habitable aprox." in feature_head_item):
-                house.setdefault('n_rooms', self._generate_string(feature_head_item, "Superficie habitable aprox.", True))
+                house['useful_area'] = self._generate_string(feature_head_item, "Superficie habitable aprox.", True)
             elif ("Superficie construida aprox." in feature_head_item):
-                house.setdefault('n_rooms', self._generate_string(feature_head_item, "Superficie construida aprox.", True))
+                house['built_area'] = self._generate_string(feature_head_item, "Superficie construida aprox.", True)
             elif ("Terreno aprox." in feature_head_item):
-                house.setdefault('n_rooms', self._generate_string(feature_head_item, "Terreno aprox.", True))
+                house['land_area'] = self._generate_string(feature_head_item, "Terreno aprox.", True)
         
         feature_detail_items = [item.text for item in self.driver.find_elements(By.XPATH, "//ul[contains(@class,'ev-exposee-detail-facts')]/li[contains(@class,'ev-exposee-detail-fact')]") if item]
         for feature_detail_item in feature_detail_items:
             # POSIBLES REPETIDOS
-            if ("Cuartos" in feature_detail_item):
-                house.setdefault('n_rooms', self._generate_string(feature_detail_item, "Cuartos"))
-            elif ("Dormitorios" in feature_detail_item):
-                house.setdefault('n_bedrooms', self._generate_string(feature_detail_item, "Dormitorios"))
-            elif ("Baños" in feature_detail_item):
-                house.setdefault('n_bathrooms', self._generate_string(feature_detail_item, "Baños"))
-            elif ("Superficie habitable aprox." in feature_detail_item):
-                house.setdefault('useful_area', self._generate_string(feature_detail_item, "Superficie habitable aprox."))
-            elif ("Superficie construida aprox." in feature_detail_item):
-                house.setdefault('built_area', self._generate_string(feature_detail_item, "Superficie construida aprox."))
-            elif ("Terreno aprox." in feature_detail_item):
-                house.setdefault('land_area', self._generate_string(feature_detail_item, "Terreno aprox."))
+            if ("Cuartos" in feature_detail_item and house['n_rooms'] == None):
+                house['n_rooms'] =  self._generate_string(feature_detail_item, "Cuartos")
+            elif ("Dormitorios" in feature_detail_item and house['n_bedrooms'] == None):
+                house['n_bedrooms'] = self._generate_string(feature_detail_item, "Dormitorios")
+            elif ("Baños" in feature_detail_item and house['n_bathrooms'] == None):
+                house['n_bathrooms'] = self._generate_string(feature_detail_item, "Baños")
+            elif ("Superficie habitable aprox." in feature_detail_item and house['useful_area'] == None):
+                house['useful_area'] = self._generate_string(feature_detail_item, "Superficie habitable aprox.")
+            elif ("Superficie construida aprox." in feature_detail_item and house['built_area'] == None):
+                house['built_area'] = self._generate_string(feature_detail_item, "Superficie construida aprox.")
+            elif ("Terreno aprox." in feature_detail_item and house['land_area'] == None):
+                house['land_area'] = self._generate_string(feature_detail_item, "Terreno aprox.")
 
             # NO REPETIDOS
             elif ("E&V ID" in feature_detail_item):
-                house.setdefault('eav_id', self._generate_string(feature_detail_item, "E&V ID"))
+                 house['eav_id'] = self._generate_string(feature_detail_item, "E&V ID")
             elif ("Año de construcción" in feature_detail_item):
-                house.setdefault('built_year', self._generate_string(feature_detail_item, "Año de construcción"))
+                house['built_year'] = self._generate_string(feature_detail_item, "Año de construcción")
             elif ("Clase de eficiencia energética" in feature_detail_item):
-                house.setdefault('energy_class', self._generate_string(feature_detail_item, "Clase de eficiencia energética"))
+                house['energy_class'] = self._generate_string(feature_detail_item, "Clase de eficiencia energética")
             elif ("Valor de consumo energético" in feature_detail_item):
-                house.setdefault('energy_consumption', self._generate_string(feature_detail_item, "Valor de consumo energético"))
+                house['energy_consumption'] = self._generate_string(feature_detail_item, "Valor de consumo energético")
             elif ("CO2 emission" in feature_detail_item):
-                house.setdefault('co2_emission', self._generate_string(feature_detail_item, "CO2 emission"))
+                house['co2_emission'] = self._generate_string(feature_detail_item, "CO2 emission")
             elif ("Escala de Emisiones de CO2" in feature_detail_item):
-                house.setdefault('co2_emission_scale', self._generate_string(feature_detail_item, "Escala de Emisiones de CO2"))
+                house['co2_emission_scale'] =  self._generate_string(feature_detail_item, "Escala de Emisiones de CO2")
             elif ("Edificio protegido" in feature_detail_item):
                 house['protected'] = True
             elif ("Estado" in feature_detail_item):
-                house.setdefault('status', self._generate_string(feature_detail_item, "Estado"))
+                house['status'] = self._generate_string(feature_detail_item, "Estado")
             elif ("Parking" in feature_detail_item):
-                house.setdefault('parking', self._generate_string(feature_detail_item, "Parking"))
+                house['parking'] = self._generate_string(feature_detail_item, "Parking")
             elif ("Garaje" in feature_detail_item):
-                house.setdefault('garage', self._generate_string(feature_detail_item, "Garaje"))
+                house['garage'] = self._generate_string(feature_detail_item, "Garaje")
             elif ("Revestimiento del suelo" in feature_detail_item):
-                house.setdefault('floor_cover', self._generate_string(feature_detail_item, "Revestimiento del suelo"))
+                house['floor_cover'] = self._generate_string(feature_detail_item, "Revestimiento del suelo")
             elif ("Subclase de la propiedad" in feature_detail_item):
-                house.setdefault('property_subclass', self._generate_string(feature_detail_item, "Subclase de la propiedad"))
+                house['property_subclass'] = self._generate_string(feature_detail_item, "Subclase de la propiedad")
             elif ("Terraza" in feature_detail_item):
-                house.setdefault('terrace_area', self._generate_string(feature_detail_item, "Terraza"))
+                house['terrace_area'] = self._generate_string(feature_detail_item, "Terraza")
             elif ("Tipo de calefacción" in feature_detail_item):
-                house.setdefault('heating_type', self._generate_string(feature_detail_item, "Tipo de calefacción"))
+                house['heating_type'] = self._generate_string(feature_detail_item, "Tipo de calefacción")
             elif ("Ubicación" in feature_detail_item):
-                house.setdefault('location_status', self._generate_string(feature_detail_item, "Ubicación"))
+                house['location_status'] = self._generate_string(feature_detail_item, "Ubicación")
 
         print("Scraped HOME: {htitle}".format(htitle = title))
         return house
@@ -191,7 +216,7 @@ class EngelAndVolkersScraper:
             pass
         
     """
-    Navega por cada p´gina de la busqueda de viviendas, en cada página se extraen los links de las viviendas
+    Navega por cada página de la busqueda de viviendas, en cada página se extraen los links de las viviendas
     En la primera iteración se ha de aceptar/declinar las cookies
     @Return: void
     """
@@ -200,6 +225,8 @@ class EngelAndVolkersScraper:
         nextPage = self.mainUrl
         errors, houses = [], []
         while nextPage != None:
+            if (i == 2):
+                break
             try:
                 self._get_page(nextPage)
             except:
