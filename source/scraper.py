@@ -225,8 +225,6 @@ class EngelAndVolkersScraper:
         nextPage = self.mainUrl
         errors, houses = [], []
         while nextPage != None:
-            if (i == 2):
-                break
             try:
                 self._get_page(nextPage)
             except:
