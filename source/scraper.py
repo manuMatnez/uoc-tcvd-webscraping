@@ -190,7 +190,7 @@ class EngelAndVolkersScraper:
             elif ("Ubicación" in feature_detail_item):
                 house['location_status'] = self._generate_string(feature_detail_item, "Ubicación")
 
-        print("Scraped HOME: {htitle}".format(htitle = title))
+        print("-> SCRAPED home: {htitle}".format(htitle = title))
         return house
     
     """
@@ -200,8 +200,8 @@ class EngelAndVolkersScraper:
     @Param3 link : <String> (enlace fallido)
     @Return: dict
     """
-    def _build_error(self, index, level, link):
-        return {"page_index": index+1, "level": "page", level: link}
+    def _build_error(self, index, level, link, exceptionType):
+        return {"page_index": index+1, "level": level, "link": link, "exceptionType": exceptionType}
 
     """
     Declina el uso de cookies de la página web
@@ -227,8 +227,9 @@ class EngelAndVolkersScraper:
         while nextPage != None:
             try:
                 self._get_page(nextPage)
-            except:
-                errors.append(self._build_error(i, "page", nextPage))
+            except Exception as e:
+                errors.append(self._build_error(i, "page", nextPage, type(e)))
+                print("-> ERROR on page {pagelink} with exception {exceptionType}".format(pagelink = nextPage, exceptionType = type(e)))
                 break
 
             if (nextPage == self.mainUrl):
@@ -239,8 +240,9 @@ class EngelAndVolkersScraper:
                 try:
                     self._get_page(link)
                     houses.append(self._build_house())
-                except:
-                    errors.append(self._build_error(i, "link", link))
+                except Exception as e:
+                    errors.append(self._build_error(i, "link", link, type(e)))
+                    print("-> ERROR on link {pagelink} with exception {exceptionType}".format(pagelink = link, exceptionType = type(e)))
             i += 1
         if(houses):
             df = pd.DataFrame(houses)
@@ -250,7 +252,7 @@ class EngelAndVolkersScraper:
             df_errors = pd.DataFrame(errors)
             error_file_name = "errors_{tstamp}.csv".format(tstamp = time.time())
             df_errors.to_csv (error_file_name, index = True)
-        self.driver.close()
+        self.driver.quit()
 
 """
 Programa principal
