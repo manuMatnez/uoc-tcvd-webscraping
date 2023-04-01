@@ -3,8 +3,9 @@
 import undetected_chromedriver as uc
 from selenium.webdriver.common.by import By
 from selenium.common.exceptions import NoSuchElementException
-from time import sleep
+import time
 from random import randint
+import pandas as pd
 
  # 
  # This file is part of the practice 1 of the Tipología y ciclo de vida de los datos
@@ -38,11 +39,11 @@ class EngelAndVolkersScraper:
 
     """
     Carga la página que se desea aplicar scraping, se aplica un delay aleatorio de entre 2 y 5 segundos
-    @Params url : <String>
+    @Param1 url : <String>
     @Return void
     """
     def _get_page(self, url): 
-        sleep(randint(1,3))
+        time.sleep(randint(1,3))
         self.driver.get(url)
 
     """
@@ -65,6 +66,13 @@ class EngelAndVolkersScraper:
         except NoSuchElementException:
             return None
     
+    """
+    Obtiene el valor de un elemento deseado que puede venir como 'value\nkey' o 'key value'
+    @Params item : <String> (texto clave-valor)
+    @Param2 column_name : <String> (columna a aplicar el substring)
+    @Param3 head : <bool> (cabecero o cuerpo)
+    @Return: String
+    """
     def _generate_string(self, item, column_name, head=False):
         if (head):
             return item[0:item.index(column_name)]
@@ -77,7 +85,7 @@ class EngelAndVolkersScraper:
     Hay dos listas de claves y dos listas de valores, una es de la cabecera de la casa y otra de los detalles extras
     Con lo cual se tendran listas de claves y listas de valores en als que debe de haber la misma dimensión
     Se comprueba con REGEX cada elemento de cada lista de 'claves' y se coge el valor del mismo indice y se guarda en variable
-    @Return: FIXME
+    @Return: dict
     """
     def _build_house(self):
         house = {}
@@ -156,11 +164,20 @@ class EngelAndVolkersScraper:
                 house.setdefault('heating_type', self._generate_string(feature_detail_item, "Tipo de calefacción"))
             elif ("Ubicación" in feature_detail_item):
                 house.setdefault('location_status', self._generate_string(feature_detail_item, "Ubicación"))
-  
-        print("\n")
-        print("------",title,"--------")
+
+        print("Scraped HOME: {htitle}".format(htitle = title))
         return house
     
+    """
+    Crea una entrada de error como JSON
+    @Params index : <int> (número de página donde ha fallado)
+    @Param2 level : <String> (es página o sub-página)
+    @Param3 link : <String> (enlace fallido)
+    @Return: dict
+    """
+    def _build_error(self, index, level, link):
+        return {"page_index": index+1, "level": "page", level: link}
+
     """
     Declina el uso de cookies de la página web
     Utiliza XPATH para localizar el componente de botón que declina
@@ -181,21 +198,33 @@ class EngelAndVolkersScraper:
     def get_data(self):
         i = 0
         nextPage = self.mainUrl
+        errors, houses = [], []
         while nextPage != None:
-            if (i == 2):
+            try:
+                self._get_page(nextPage)
+            except:
+                errors.append(self._build_error(i, "page", nextPage))
                 break
-            self._get_page(nextPage)
 
             if (nextPage == self.mainUrl):
                 self._decline_cookies()
             nextPage = self._get_next_page()
 
             for link in self._get_item_links():
-                self._get_page(link)
-                tmp = self._build_house()
-                print(tmp)
-
+                try:
+                    self._get_page(link)
+                    houses.append(self._build_house())
+                except:
+                    errors.append(self._build_error(i, "link", link))
             i += 1
+        if(houses):
+            df = pd.DataFrame(houses)
+            houses_file_name = "eav_houses_{tstamp}.csv".format(tstamp = time.time())
+            df.to_csv (houses_file_name, index = True)
+        if (errors):
+            df_errors = pd.DataFrame(errors)
+            error_file_name = "errors_{tstamp}.csv".format(tstamp = time.time())
+            df_errors.to_csv (error_file_name, index = True)
         self.driver.close()
 
 """
