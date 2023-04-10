@@ -38,7 +38,7 @@ class EngelAndVolkersScraper:
         self.driver = driver    
 
     """
-    Carga la página que se desea aplicar scraping, se aplica un delay aleatorio de entre 2 y 5 segundos
+    Carga la página que se desea aplicar scraping, se aplica un delay aleatorio de entre 1 y 3 segundos
     @Param1 url : <String>
     @Return void
     """
@@ -82,9 +82,8 @@ class EngelAndVolkersScraper:
     """
     Se hace scraping en la web de la vivienda cargada para sacar los atributos necesarios para generar el csv
     En este caso los datos estan un poco segmentados básicamente tienen etiquetas por resumirlo: de clave valor
-    Hay dos listas de claves y dos listas de valores, una es de la cabecera de la casa y otra de los detalles extras
-    Con lo cual se tendran listas de claves y listas de valores en als que debe de haber la misma dimensión
-    Se comprueba con REGEX cada elemento de cada lista de 'claves' y se coge el valor del mismo indice y se guarda en variable
+    Los elememtos principales de la cabecera tienen el formato 'valor\nclave' y los elementos de los detalles 'clave valor'
+    Por tanto se generan dos listas y se aplica substring a ambas siguiendo dos estrategias
     @Return: dict
     """
     def _build_house(self):
@@ -142,7 +141,10 @@ class EngelAndVolkersScraper:
             elif ("Terreno aprox." in feature_head_item):
                 house['land_area'] = self._generate_string(feature_head_item, "Terreno aprox.", True)
         
-        feature_detail_items = [item.text for item in self.driver.find_elements(By.XPATH, "//ul[contains(@class,'ev-exposee-detail-facts')]/li[contains(@class,'ev-exposee-detail-fact')]") if item]
+        # [not(descendant::*[contains(@class,'ev-exposee-detail-sub-facts')])] impide que se traiga a los hijos, teníamos un problema y es que queremos los ul(ev-exposee-detail-facts)/li(ev-exposee-detail-fact), pero
+        # existen otros elementos en la web que usan las mismas clases ul (ev-exposee-detail-facts)/li(ev-exposee-detail-fact) pero que tienen un span/ul/li colgandod e ellos que nos mezclaba el contenido y nos impedía sacar bien la información
+        # básicamente se quiere evitar el class ev-exposee-detail-sub-facts de los ancestros
+        feature_detail_items = [item.text for item in self.driver.find_elements(By.XPATH, "//ul[contains(@class,'ev-exposee-detail-facts')]/li[contains(@class,'ev-exposee-detail-fact')][not(descendant::*[contains(@class,'ev-exposee-detail-sub-facts')])]") if item]
         for feature_detail_item in feature_detail_items:
             # POSIBLES REPETIDOS
             if ("Cuartos" in feature_detail_item and house['n_rooms'] == None):
