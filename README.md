@@ -1,6 +1,4 @@
-# Práctica 1: Cómo podemos capturar los datos de la web? [UOC - Tipología y ciclo de vida de los datos aula 1]
-
-## Viviendas de lujo en venta de E & V en Barcelona
+# Práctica 1: Viviendas de lujo en venta de E & V en Barcelona [UOC - Tipología y ciclo de vida de los datos aula 1]
 
 ## Descripción
 
@@ -8,8 +6,9 @@ Este proyecto ha sido desarrollado para la asignatura de **Tipología y ciclo de
 
 El dataset contiene información de **2105 viviendas de lujo**, en venta, disponibles en la provincia de Barcelona. La información incluida en este dataset es una recopilación de **25 características de las propiedades**, como son el número de habitaciones, el tipo de inmueble, el número de baños, el barrio donde ubica, el año de construcción, el estado del inmueble y la descripción, entre otras, así como el precio de venta.
 
-**Zenodo**: https://zenodo.org/record/7823310#.ZDbmcS9j6_I
-**DOI**: 10.5281/zenodo.7823310
+* **Zenodo**: https://zenodo.org/record/7823310#.ZDbmcS9j6_I
+
+* **DOI**: 10.5281/zenodo.7823310
 
 ### Variables
 
