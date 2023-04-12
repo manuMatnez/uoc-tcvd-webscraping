@@ -34,7 +34,7 @@ La actividad ha sido realizada por: **Vanessa Moreno González** y **Manuel Erne
 
 **GNU General Public License v3.0**
 
-La razón principal para elegir esta licencia es que se trata de una licencia de software libre y código abierto y permite que los usuarios de este, puedan libremente usar, estudiar y compartir este dataset. Esta licencia es tipo copyleft, que garantiza que la distribución de estos datos se haga bajo esta misma licencia.
+La razón principal para elegir esta licencia es que se trata de una licencia de software libre y código abierto y permite que los usuarios de éste, puedan libremente usar, estudiar y compartir este dataset. Esta licencia es tipo copyleft, que garantiza que la distribución de estos datos se haga bajo esta misma licencia.
 
 ## Información adicional
 
