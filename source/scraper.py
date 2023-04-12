@@ -103,7 +103,7 @@ class EngelAndVolkersScraper:
             "energy_consumption": None,
             "co2_emission": None,
             "co2_emission_scale": None,
-            "protected": False,
+            "protected": None,
             "status": None,
             "parking": None,
             "garage": None,
@@ -248,7 +248,7 @@ class EngelAndVolkersScraper:
             i += 1
         if(houses):
             df = pd.DataFrame(houses)
-            houses_file_name = "eav_houses_{tstamp}.csv".format(tstamp = time.time())
+            houses_file_name = "Viviendas_de_lujo_en_venta_de_E&V_en_Barcelona.csv"
             df.to_csv (houses_file_name, index = True)
         if (errors):
             df_errors = pd.DataFrame(errors)
