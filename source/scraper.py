@@ -30,7 +30,7 @@ Universitat Oberta de Catalunya: Tipología y ciclo de vida de los datos
 
 Autores: Manuel Ernesto Martínez Martín, Vanessa Moreno Gonzalez
 
-EngelAndVolkersScraper: Extrae la información de viviendas de EneglAndVolkers de una zona concreta y genera un archivo csv
+EngelAndVolkersScraper: Extrae la información de viviendas de Engel&Volkers de una zona concreta y genera un archivo el archivo "Viviendas de lujo en venta de E & V en Barcelona.csv"
 """
 class EngelAndVolkersScraper:
     def __init__(self, url, driver):
