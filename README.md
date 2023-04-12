@@ -14,6 +14,8 @@ El dataset contiene información de **2105 viviendas de lujo**, en venta, dispon
 
 id, eav_id, title, subtitle, n_rooms, n_bedrooms, n_bathrooms, useful_area, built_area, land_area, price, built_year, energy_class, energy_consumption, co2_emission, co2_emission_scale, protected, status, parking, garage, floor_cover, property_subclass, terrace_area, heating_type, location_status
 
+No se ha realizado preprocesado de las variables.
+
 ## Miembros del equipo
 
 La actividad ha sido realizada por: **Vanessa Moreno González** y **Manuel Ernesto Martínez Martín**.
@@ -45,3 +47,5 @@ La razón principal para elegir esta licencia es que se trata de una licencia de
 ## Recursos
 
 Subirats Maté, L. y Calvo González, M. (2019). Web Scraping [Material Digital].Tipología y ciclo de vida de los datos . Universidad Oberta de Catalunya.
+
+Lawson, R. (2015). Web Scraping with Python. Packt Publishing Ltd. Chapter 2. Scraping the Data.
