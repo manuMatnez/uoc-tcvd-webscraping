@@ -181,16 +181,20 @@ class EngelAndVolkersScraper:
                 house['parking'] = self._generate_string(feature_detail_item, "Parking")
             elif ("Garaje" in feature_detail_item):
                 house['garage'] = self._generate_string(feature_detail_item, "Garaje")
-            elif ("Revestimiento del suelo" in feature_detail_item):
-                house['floor_cover'] = self._generate_string(feature_detail_item, "Revestimiento del suelo")
             elif ("Subclase de la propiedad" in feature_detail_item):
                 house['property_subclass'] = self._generate_string(feature_detail_item, "Subclase de la propiedad")
             elif ("Terraza" in feature_detail_item):
                 house['terrace_area'] = self._generate_string(feature_detail_item, "Terraza")
-            elif ("Tipo de calefacción" in feature_detail_item):
-                house['heating_type'] = self._generate_string(feature_detail_item, "Tipo de calefacción")
             elif ("Ubicación" in feature_detail_item):
                 house['location_status'] = self._generate_string(feature_detail_item, "Ubicación")
+              
+        #Añadimos estas lineas para los que si tienen ancestros
+        feature_detail_items_2 = [item.text for item in self.driver.find_elements(By.XPATH, "//ul[contains(@class,'ev-exposee-detail-facts')]/li[contains(@class,'ev-exposee-detail-fact')]") if item]
+        for item in feature_detail_items_2:
+            if ("Revestimiento del suelo" in item):
+                house['foor_cover'] = self._generate_string(item, "Revestimiento del suelo")
+            elif ("Tipo de calefacción" in feature_detail_item):
+                house['heating_type'] = self._generate_string(item, "Tipo de calefacción")
 
         print("-> SCRAPED home: {htitle}".format(htitle = title))
         return house
