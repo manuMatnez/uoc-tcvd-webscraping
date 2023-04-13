@@ -193,7 +193,7 @@ class EngelAndVolkersScraper:
         for item in feature_detail_items_2:
             if ("Revestimiento del suelo" in item):
                 house['foor_cover'] = self._generate_string(item, "Revestimiento del suelo")
-            elif ("Tipo de calefacción" in feature_detail_item):
+            elif ("Tipo de calefacción" in item):
                 house['heating_type'] = self._generate_string(item, "Tipo de calefacción")
 
         print("-> SCRAPED home: {htitle}".format(htitle = title))
