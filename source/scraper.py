@@ -192,7 +192,7 @@ class EngelAndVolkersScraper:
         feature_detail_items_2 = [item.text for item in self.driver.find_elements(By.XPATH, "//ul[contains(@class,'ev-exposee-detail-facts')]/li[contains(@class,'ev-exposee-detail-fact')]") if item]
         for item in feature_detail_items_2:
             if ("Revestimiento del suelo" in item):
-                house['foor_cover'] = self._generate_string(item, "Revestimiento del suelo")
+                house['floor_cover'] = self._generate_string(item, "Revestimiento del suelo")
             elif ("Tipo de calefacción" in item):
                 house['heating_type'] = self._generate_string(item, "Tipo de calefacción")
 
