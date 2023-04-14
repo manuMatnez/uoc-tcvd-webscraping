@@ -8,9 +8,10 @@ El dataset contiene información de **2111 viviendas de lujo**, en venta, dispon
 
 ### Dataset
 
-* **Zenodo**: https://zenodo.org/record/7823310#.ZDbmcS9j6_I
+* **Zenodo**: https://zenodo.org/record/7827625#.ZDkAvS9j6_I
 
-* **DOI**: 10.5281/zenodo.7823310
+
+* **DOI**: 10.5281/zenodo.7827625
 
 Los datos del dataset son propiedad de la empresa EV MCC SPAIN S.L.U titular de licencia de ENGEL & VÖLKERS GMBH. 
 
