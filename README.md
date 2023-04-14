@@ -4,7 +4,7 @@
 
 Este proyecto ha sido desarrollado para la asignatura de **Tipología y ciclo de vida de los datos** del máster de **Ciencia de Datos** de la **Universitat Oberta de Catalunya** y tiene como objetivo recopilar datos sobre el sector inmobiliario de lujo en la provincia de Barcelona, reuniendo información de las características de los inmuebles en venta, como pueden ser la ubicación, el tamaño o la antigüedad, entre otros, que pueden influir en su precio de venta. Estos datos, se emplearán para crear modelos predictivos que permitan estimar el precio de las viviendas en función de sus características.
 
-El dataset contiene información de **2105 viviendas de lujo**, en venta, disponibles en la provincia de Barcelona. La información incluida en este dataset es una recopilación de **25 características de las propiedades**, como son el número de habitaciones, el tipo de inmueble, el número de baños, el barrio donde ubica, el año de construcción, el estado del inmueble y la descripción, entre otras, así como el precio de venta.
+El dataset contiene información de **2111 viviendas de lujo**, en venta, disponibles en la provincia de Barcelona. La información incluida en este dataset es una recopilación de **25 características de las propiedades**, como son el número de habitaciones, el tipo de inmueble, el número de baños, el barrio donde ubica, el año de construcción, el estado del inmueble y la descripción, entre otras, así como el precio de venta.
 
 ### Dataset
 
